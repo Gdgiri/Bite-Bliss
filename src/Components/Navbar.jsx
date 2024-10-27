@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom"; // Import useLocation
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useLocation
 import { Button } from "flowbite-react"; // Ensure Flowbite is installed
-import { CiImport, CiLogin, CiMenuBurger } from "react-icons/ci";
+import { CiMenuBurger } from "react-icons/ci";
+import { IoMdClose } from "react-icons/io";
+import { RiLoginCircleLine } from "react-icons/ri";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // State to track mobile menu visibility
   const location = useLocation(); // Get the current route
 
@@ -34,12 +37,8 @@ const Navbar = () => {
     setMobileMenuOpen(false); // Close mobile menu on link click
   };
 
-  const downloadResume = () => {
-    // Trigger a download programmatically
-    const link = document.createElement("a");
-    link.href = "/mern-syllabus.pdf"; // Path to your PDF file
-    link.download = "My_Resume.pdf"; // Filename for the downloaded file
-    link.click();
+  const LoginPage = () => {
+    navigate("/login");
   };
 
   return (
@@ -66,12 +65,12 @@ const Navbar = () => {
 
         {/* Right Side - Toggle Button for Mobile View */}
         <div className="md:hidden">
-          <Button
-            color="failure"
+          <button
+            className="bg-heads1 text-2xl text-white font-bold px-4 py-2 rounded-lg shadow-lg "
             onClick={() => setMobileMenuOpen(!isMobileMenuOpen)} // Toggle mobile menu
           >
             {isMobileMenuOpen ? <IoMdClose /> : <CiMenuBurger />}
-          </Button>
+          </button>
         </div>
 
         {/* Center - Navigation Links */}
@@ -142,8 +141,8 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("home")}
                 className={`${
                   activeLink === "home"
-                    ? "bg-white text-red-600 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-tomato font-bold px-4 py-2 rounded-lg shadow-lg"
+                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
               >
                 Home
@@ -153,8 +152,8 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("about")}
                 className={`${
                   activeLink === "about"
-                    ? "bg-white text-red-600 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-tomato font-bold px-4 py-2 rounded-lg shadow-lg"
+                    ? " bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
               >
                 About
@@ -164,8 +163,8 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("portfolio")}
                 className={`${
                   activeLink === "portfolio"
-                    ? "bg-white text-red-600 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-tomato font-bold px-4 py-2 rounded-lg shadow-lg"
+                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
               >
                 Recipes
@@ -175,8 +174,8 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("gallery")}
                 className={`${
                   activeLink === "gallery"
-                    ? "bg-white text-red-600 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-tomato font-bold px-4 py-2 rounded-lg shadow-lg"
+                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
               >
                 Gallery
@@ -186,36 +185,36 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("contact")}
                 className={`${
                   activeLink === "contact"
-                    ? "bg-white text-red-600 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-tomato font-bold px-4 py-2 rounded-lg shadow-lg"
+                    ? "bg-white text-heads10 font-bold px-4 py-2 rounded-lg shadow-lg"
+                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
               >
                 Contact
               </Link>
 
-              {/* Download CV Button in Mobile Menu */}
-              <Button
-                color="failure"
-                onClick={downloadResume}
-                className="flex items-center space-x-2"
+              <button
+                onClick={LoginPage}
+                className="flex items-center space-x-2  bg-heads1 text-xl text-white font-bold px-4 py-2 rounded-lg shadow-lg"
               >
-                <CiLogin />
+                <span className="text-2xl">
+                  <RiLoginCircleLine />
+                </span>
+
                 <span>Login</span>
-              </Button>
+              </button>
             </div>
           </div>
         )}
 
-        {/* Right Side - Download CV Button (Desktop) */}
         <div className="hidden md:block">
           <Button
             color=""
-            onClick={downloadResume}
+            onClick={LoginPage}
             style={{ color: "#C57844" }}
             className="flex items-center space-x-2 "
           >
             <span className="text-2xl">
-              <CiLogin />
+              <RiLoginCircleLine />
             </span>
             <span className="font-extrabold">Login</span>
           </Button>

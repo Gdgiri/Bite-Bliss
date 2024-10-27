@@ -6,8 +6,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        tomato: "#F08080",
-        tomato1: "#2F2F2F",
         heads:"#D6883C",
         heads1:"#C57844"
       },
