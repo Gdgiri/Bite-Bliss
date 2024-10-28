@@ -2,6 +2,7 @@ import { Button } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThreeCircles } from "react-loader-spinner"; // Import the ThreeCircles component
+import { SiIfood } from "react-icons/si"; // Import the SiIfood icon
 
 const FrontPage = () => {
   const navigate = useNavigate();
@@ -76,6 +77,7 @@ const FrontPage = () => {
                 onClick={handleClick}
                 disabled={loading} // Disable the button if loading
               >
+                <SiIfood className="inline mr-2" /> {/* Icon before text */}
                 {loading ? "Navigating..." : "Explore Recipes"}
               </button>
             </div>

@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useLocation
-import { Button } from "flowbite-react"; // Ensure Flowbite is installed
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "flowbite-react";
 import { CiMenuBurger } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
-import { RiLoginCircleLine } from "react-icons/ri";
+import { RiLoginCircleLine, RiLogoutCircleLine } from "react-icons/ri";
+import { useSelector, useDispatch } from "react-redux";
+import { logOut } from "../Redux/Slice/userSlice";
+import { FaUserCheck } from "react-icons/fa";
+import { AiOutlineUser } from "react-icons/ai"; // Import the profile icon
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // State to track mobile menu visibility
-  const location = useLocation(); // Get the current route
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const location = useLocation();
+  const dropdownRef = useRef(null);
 
-  // Set the active link based on the current location path
   const getActiveLink = () => {
     switch (location.pathname) {
       case "/about":
@@ -22,7 +29,7 @@ const Navbar = () => {
       case "/contact":
         return "contact";
       default:
-        return "home";
+        return "home"; // This will be set to "home" for the root path
     }
   };
 
@@ -30,21 +37,48 @@ const Navbar = () => {
 
   useEffect(() => {
     setActiveLink(getActiveLink());
-  }, [location]); // Update the active link whenever the route changes
+  }, [location]);
 
   const handleLinkClick = (link) => {
-    setActiveLink(link); // Set the active link state
-    setMobileMenuOpen(false); // Close mobile menu on link click
+    setActiveLink(link);
+    setMobileMenuOpen(false);
   };
 
-  const LoginPage = () => {
+  const handleLoginClick = () => {
     navigate("/login");
   };
+
+  const handleProfileClick = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
+  const handleLogoutClick = () => {
+    dispatch(logOut()); // Call the logOut thunk
+    navigate("/login"); // Redirect to login
+    window.location.reload(); // Optionally refresh the page to update state
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center p-4 sm:justify-center md:justify-between">
-        {/* Left Side - Brand Name */}
+        {/* Brand Name */}
         <div className="text-xl font-bold text-gray-800">
           <a href="/">
             <span
@@ -63,161 +97,159 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Right Side - Toggle Button for Mobile View */}
+        {/* Mobile Menu Toggle Button */}
         <div className="md:hidden">
           <button
-            className="bg-heads1 text-2xl text-white font-bold px-4 py-2 rounded-lg shadow-lg "
-            onClick={() => setMobileMenuOpen(!isMobileMenuOpen)} // Toggle mobile menu
+            className="bg-heads1 text-2xl text-white font-bold px-4 py-2 rounded-lg shadow-lg"
+            onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <IoMdClose /> : <CiMenuBurger />}
           </button>
         </div>
 
-        {/* Center - Navigation Links */}
+        {/* Navigation Links */}
         <div className={`hidden md:flex space-x-4`}>
-          <Link
-            to="/"
-            onClick={() => handleLinkClick("home")}
-            className={`${
-              activeLink === "home"
-                ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                : "bg-gray-100 text-#D6883C hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            onClick={() => handleLinkClick("about")}
-            className={`${
-              activeLink === "about"
-                ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-            }`}
-          >
-            About
-          </Link>
-          <Link
-            to="/recipe"
-            onClick={() => handleLinkClick("recipe")}
-            className={`${
-              activeLink === "recipe"
-                ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-            }`}
-          >
-            Recipes
-          </Link>
-          <Link
-            to="/gallery"
-            onClick={() => handleLinkClick("gallery")}
-            className={`${
-              activeLink === "gallery"
-                ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-            }`}
-          >
-            Gallery
-          </Link>
-          <Link
-            to="/contact"
-            onClick={() => handleLinkClick("contact")}
-            className={`${
-              activeLink === "contact"
-                ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-            }`}
-          >
-            Contact
-          </Link>
+          {["", "about", "recipe", "gallery", "contact"].map((link) => (
+            <Link
+              key={link}
+              to={`/${link}`}
+              onClick={() => handleLinkClick(link === "" ? "home" : link)}
+              className={`${
+                activeLink === (link === "" ? "home" : link)
+                  ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                  : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
+              }`}
+            >
+              {link === ""
+                ? "Home"
+                : link.charAt(0).toUpperCase() + link.slice(1)}
+            </Link>
+          ))}
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="absolute top-16 left-0 w-full bg-white shadow-md md:hidden">
             <div className="flex flex-col items-center space-y-2 p-4">
-              <Link
-                to="/"
-                onClick={() => handleLinkClick("home")}
-                className={`${
-                  activeLink === "home"
-                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-                } text-center`}
-              >
-                Home
-              </Link>
-              <Link
-                to="/about"
-                onClick={() => handleLinkClick("about")}
-                className={`${
-                  activeLink === "about"
-                    ? " bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-                } text-center`}
-              >
-                About
-              </Link>
-              <Link
-                to="/recipe"
-                onClick={() => handleLinkClick("recipe")}
-                className={`${
-                  activeLink === "recipe"
-                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-                } text-center`}
-              >
-                Recipes
-              </Link>
-              <Link
-                to="/gallery"
-                onClick={() => handleLinkClick("gallery")}
-                className={`${
-                  activeLink === "gallery"
-                    ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-                } text-center`}
-              >
-                Gallery
-              </Link>
-              <Link
-                to="/contact"
-                onClick={() => handleLinkClick("contact")}
-                className={`${
-                  activeLink === "contact"
-                    ? "bg-white text-heads10 font-bold px-4 py-2 rounded-lg shadow-lg"
-                    : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
-                } text-center`}
-              >
-                Contact
-              </Link>
+              {["", "about", "recipe", "gallery", "contact"].map((link) => (
+                <Link
+                  key={link}
+                  to={`/${link}`}
+                  onClick={() => handleLinkClick(link === "" ? "home" : link)}
+                  className={`${
+                    activeLink === (link === "" ? "home" : link)
+                      ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
+                      : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
+                  } text-center`}
+                >
+                  {link === ""
+                    ? "Home"
+                    : link.charAt(0).toUpperCase() + link.slice(1)}
+                </Link>
+              ))}
 
-              <button
-                onClick={LoginPage}
-                className="flex items-center space-x-2  bg-heads1 text-xl text-white font-bold px-4 py-2 rounded-lg shadow-lg"
-              >
-                <span className="text-2xl">
-                  <RiLoginCircleLine />
-                </span>
-
-                <span>Login</span>
-              </button>
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    onClick={handleProfileClick}
+                    className="flex items-center bg-heads1 text-white font-bold px-4 py-2 rounded-lg shadow-lg"
+                  >
+                    {/* Show profile icon */}
+                    <AiOutlineUser className="text-2xl" />
+                    <span className="ml-2">{user.username}</span>
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 transform transition-all duration-300 scale-105">
+                      <ul className="py-1">
+                        <li>
+                          <button
+                            onClick={handleProfile}
+                            className="block w-full text-center px-4 py-2 text-gray-700 hover:text-white hover:bg-heads"
+                          >
+                            <span className="flex items-center">
+                              <FaUserCheck className="mr-2" />
+                              Profile
+                            </span>
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={handleLogoutClick}
+                            className="block w-full text-center px-4 py-2 text-gray-700 hover:text-white hover:bg-heads"
+                          >
+                            <span className="flex items-center">
+                              <RiLogoutCircleLine className="mr-2" />
+                              Logout
+                            </span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={handleLoginClick}
+                  className="flex items-center bg-heads1 text-xl text-white font-bold px-4 py-2 rounded-lg shadow-lg"
+                >
+                  <RiLoginCircleLine className="text-2xl" />
+                  <span>Login</span>
+                </button>
+              )}
             </div>
           </div>
         )}
 
-        <div className="hidden md:block">
-          <Button
-            color=""
-            onClick={LoginPage}
-            style={{ color: "#C57844" }}
-            className="flex items-center space-x-2 "
-          >
-            <span className="text-2xl">
-              <RiLoginCircleLine />
-            </span>
-            <span className="font-extrabold">Login</span>
-          </Button>
+        {/* Login/Profile Button */}
+        <div className="hidden md:block relative" ref={dropdownRef}>
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center bg-heads1 text-white font-bold px-4 py-2 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
+              >
+                {/* Show profile icon */}
+                <AiOutlineUser className="text-2xl" />
+                <span className="ml-2">{user.username}</span>
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 transform transition-all duration-300 scale-105">
+                  <ul className="py-1">
+                    <li>
+                      <button
+                        onClick={handleProfile}
+                        className="block w-full px-4 py-2 text-gray-700 hover:text-white hover:bg-heads text-center"
+                      >
+                        <span className="flex items-center">
+                          <FaUserCheck className="mr-2" />
+                          Profile
+                        </span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleLogoutClick}
+                        className="block w-full px-4 py-2 text-gray-700 hover:text-white hover:bg-heads text-center"
+                      >
+                        <span className="flex items-center">
+                          <RiLogoutCircleLine className="mr-2" />
+                          Logout
+                        </span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </>
+          ) : (
+            <button
+              onClick={handleLoginClick}
+              className="flex items-center bg-heads1 text-xl text-white font-bold px-4 py-2 rounded-lg shadow-lg"
+            >
+              <RiLoginCircleLine className="text-2xl" />
+              <span>Login</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>

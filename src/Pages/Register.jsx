@@ -6,6 +6,7 @@ import { registerUser } from "../Redux/Slice/userSlice";
 import { ThreeCircles } from "react-loader-spinner";
 import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -89,21 +90,18 @@ const Register = () => {
           {showError && (error || fieldError) && (
             <Alert color="failure" icon={HiInformationCircle} dismissible>
               <span className="font-medium">Error:</span> {error || fieldError}
-             
             </Alert>
           )}
           {showSuccess && success && (
             <Alert color="success" icon={HiInformationCircle} dismissible>
               <span className="font-medium">Success:</span> Registration
               successful!
-            
             </Alert>
           )}
           {showSuccess && success === false && (
-            <Alert color="warning " icon={HiInformationCircle} dismissible>
+            <Alert color="warning" icon={HiInformationCircle} dismissible>
               <span className="font-medium">Warning:</span> Please use a
               different email.
-              
             </Alert>
           )}
           <h1 className="text-3xl font-extrabold text-center text-amber-600 mb-6">
@@ -241,6 +239,8 @@ const Register = () => {
               )}
             </button>
           </form>
+
+         
         </div>
       )}
     </div>
