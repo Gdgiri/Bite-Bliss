@@ -76,7 +76,7 @@ const FrontPage = () => {
                 onClick={handleClick}
                 disabled={loading} // Disable the button if loading
               >
-                {loading ? "Navigating..." : "Go to Recipe"}
+                {loading ? "Navigating..." : "Explore Recipes"}
               </button>
             </div>
           </div>
