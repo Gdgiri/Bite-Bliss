@@ -98,9 +98,9 @@ const FrontPage = () => {
             <img
               src="https://i.pinimg.com/236x/3d/3f/a7/3d3fa79abc94829244006cbda86c0473.jpg"
               alt="Recipe Illustration"
-              className={`w-2/4 h-auto object-cover rounded-r-xl shadow-xl transition-transform duration-300 transform hover:scale-105 ${
+              className={`w-full md:w-2/4 h-auto object-cover rounded-r-xl shadow-xl transition-transform duration-300 transform hover:scale-105 ${
                 imageLoading ? "hidden" : "block"
-              }`} // Make image smaller and add hover effect
+              }`} // Make image responsive
               onLoad={handleImageLoad} // Set image loading to false on load
             />
           </div>
