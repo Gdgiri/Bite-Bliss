@@ -1,4 +1,3 @@
-import { Button } from "flowbite-react";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import FrontPage from "./Pages/FrontPage";
@@ -28,3 +27,4 @@ const App = () => {
 };
 
 export default App;
+
