@@ -15,8 +15,8 @@ const Navbar = () => {
     switch (location.pathname) {
       case "/about":
         return "about";
-      case "/portfolio":
-        return "portfolio";
+      case "/recipe":
+        return "recipe";
       case "/gallery":
         return "gallery";
       case "/contact":
@@ -98,10 +98,10 @@ const Navbar = () => {
             About
           </Link>
           <Link
-            to="/portfolio"
-            onClick={() => handleLinkClick("portfolio")}
+            to="/recipe"
+            onClick={() => handleLinkClick("recipe")}
             className={`${
-              activeLink === "portfolio"
+              activeLink === "recipe"
                 ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
                 : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
             }`}
@@ -159,10 +159,10 @@ const Navbar = () => {
                 About
               </Link>
               <Link
-                to="/portfolio"
-                onClick={() => handleLinkClick("portfolio")}
+                to="/recipe"
+                onClick={() => handleLinkClick("recipe")}
                 className={`${
-                  activeLink === "portfolio"
+                  activeLink === "recipe"
                     ? "bg-white text-heads1 font-bold px-4 py-2 rounded-lg shadow-lg"
                     : "bg-gray-100 text-black hover:text-heads font-bold px-4 py-2 rounded-lg shadow-lg"
                 } text-center`}
