@@ -1,61 +1,49 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL_REGISTER = "http://localhost:5000/api/register";
-
-// Register User
 export const registerUser = createAsyncThunk(
   "user/registerUser",
-  async (formData, { rejectWithValue }) => {
+  async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL_REGISTER, formData);
-      return response.data.user;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
+      const response = await axios.post(
+        "http://localhost:5000/api/register",
+        userData
       );
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue("Something went wrong. Please try again.");
     }
   }
 );
 
-// Initial State
-const initialState = {
-  user: null,
-  loading: false,
-  error: null,
-  isAuthenticated: false,
-};
-
-// User Slice
 const userSlice = createSlice({
   name: "user",
-  initialState, 
-  reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
-      state.error = null;
-      state.loading = false; 
-    },
+  initialState: {
+    loading: false,
+    error: null,
+    success: null,
   },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.success = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
+        state.success = true; // Registration success
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.success = false; // Registration failed
       });
   },
 });
 
-
-export const { logout } = userSlice.actions;
-export default userSlice.reducer; 
+export default userSlice.reducer;

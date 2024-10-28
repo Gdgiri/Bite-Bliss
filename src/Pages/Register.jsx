@@ -1,15 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react"; // Import useState and useEffect
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../Redux/Slice/userSlice";
-import { ThreeCircles } from "react-loader-spinner"; // Import the loader component
+import { ThreeCircles } from "react-loader-spinner";
+import { Alert } from "flowbite-react";
+import { HiInformationCircle } from "react-icons/hi";
 
 const Register = () => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error, success } = useSelector((state) => state.user);
 
-  // Form validation schema
+  // Local state for managing message visibility
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [fieldError, setFieldError] = useState(""); // State for field-specific errors
+
+  // Effect to manage the visibility of messages
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      const timer = setTimeout(() => setShowError(false), 2000); // Hide after 2 seconds
+      return () => clearTimeout(timer); // Cleanup timer
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => setShowSuccess(false), 2000); // Hide after 2 seconds
+      return () => clearTimeout(timer); // Cleanup timer
+    }
+  }, [success]);
+
   const validationSchema = Yup.object({
     firstName: Yup.string()
       .required("First Name is required")
@@ -25,7 +48,6 @@ const Register = () => {
       .min(6, "Password must be at least 6 characters"),
   });
 
-  // Formik setup
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -35,9 +57,17 @@ const Register = () => {
     },
     validationSchema,
     onSubmit: (values, { resetForm }) => {
-      // Dispatch the registerUser action
+      // Check for empty fields and set field error message if any are empty
+      const isEmptyField = Object.values(values).some(
+        (value) => value.trim() === ""
+      );
+      if (isEmptyField) {
+        setFieldError("Please fill in all fields."); // Set field error
+        setShowError(true); // Show error message
+        const timer = setTimeout(() => setShowError(false), 2000); // Hide after 2 seconds
+        return () => clearTimeout(timer); // Cleanup timer
+      }
       dispatch(registerUser(values));
-      // Reset the form fields after submission
       resetForm();
     },
   });
@@ -45,25 +75,41 @@ const Register = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
       {loading ? (
-        // Show the loader when loading
         <div className="flex items-center justify-center min-h-screen">
           <ThreeCircles
             height="100"
             width="100"
             color="#D6883C"
             ariaLabel="three-circles-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
           />
         </div>
       ) : (
-        // Show the registration form when not loading
         <div className="relative bg-white p-8 sm:p-10 md:p-12 rounded-2xl shadow-2xl max-w-sm w-full lg:max-w-md z-10 transform transition-transform hover:scale-105 duration-300">
+          {/* Display Error Message */}
+          {showError && (error || fieldError) && (
+            <Alert color="failure" icon={HiInformationCircle} dismissible>
+              <span className="font-medium">Error:</span> {error || fieldError}
+             
+            </Alert>
+          )}
+          {showSuccess && success && (
+            <Alert color="success" icon={HiInformationCircle} dismissible>
+              <span className="font-medium">Success:</span> Registration
+              successful!
+            
+            </Alert>
+          )}
+          {showSuccess && success === false && (
+            <Alert color="warning " icon={HiInformationCircle} dismissible>
+              <span className="font-medium">Warning:</span> Please use a
+              different email.
+              
+            </Alert>
+          )}
           <h1 className="text-3xl font-extrabold text-center text-amber-600 mb-6">
             Register
           </h1>
 
-          {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center rounded-2xl opacity-10 blur-sm"
             style={{
@@ -71,7 +117,6 @@ const Register = () => {
             }}
           ></div>
 
-          {/* Form */}
           <form
             className="space-y-6 relative z-20"
             onSubmit={formik.handleSubmit}
@@ -176,35 +221,26 @@ const Register = () => {
               ) : null}
             </div>
 
-            {/* Display Error Message */}
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
-
             {/* Register Button */}
             <button
               type="submit"
-              disabled={loading} // Disable button when loading
-              className={`w-full py-2 mt-4 font-semibold text-white rounded-lg shadow-lg ${
-                loading ? "bg-gray-400" : "bg-[#C57844] hover:bg-[#D6883C]"
-              } transform transition-transform duration-200 hover:scale-105`}
+              disabled={loading}
+              className={`w-full py-2 mt-4 text-white rounded-lg transition-colors duration-200 ${
+                loading ? "bg-gray-400" : "bg-[#D6883C] hover:bg-[#f6a83c]"
+              }`}
             >
-              {loading ? "Registering..." : "Register"}
+              {loading ? (
+                <ThreeCircles
+                  height="20"
+                  width="20"
+                  color="white"
+                  ariaLabel="three-circles-loading"
+                />
+              ) : (
+                "Register"
+              )}
             </button>
           </form>
-
-          {/* Footer Links */}
-          <div className="mt-6 text-center relative z-20">
-            <p className="text-sm">
-              Already have an account?{" "}
-              <a
-                href="/login"
-                className="text-[#C57844] font-semibold hover:underline"
-              >
-                Login
-              </a>
-            </p>
-          </div>
         </div>
       )}
     </div>
